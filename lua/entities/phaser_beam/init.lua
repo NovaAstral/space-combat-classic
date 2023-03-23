@@ -29,7 +29,6 @@ function ENT:Initialize()
 		phys:SetMass( 1 )
 	end
 
-	self.SC_Immune = true --make weapons ignore me
 	self.SB_Ignore = true --make spacebuild ignore me
 	self.warhead = false --
 	self.Untouchable = true
@@ -169,12 +168,7 @@ function ENT:BeamTrace( tr )
 		if IsValid( tr.Entity ) and tr.Entity ~= self.launcher then
 			local hit = tr.Entity
 			local mult = 1
-			/*
-			if ValidEntity( hit.SC_CoreEnt ) then
-				hit = hit.SC_CoreEnt
-				mult = 0.1
-			end
-			*/
+
 			local ct, id = CurTime(), hit:EntIndex()
 
 			--limit how frequently this object can be damaged by me
@@ -185,10 +179,6 @@ function ENT:BeamTrace( tr )
 				dmg = math.Round( dmg*(1-(((tr.HitPos - tr.StartPos):Length()/self.range)^2)) ) --Lets stop overpowered sniping
 
 				local multi = 1
-				if hit.SC_CoreEnt and hit.SC_CoreEnt.sigrad then
-					multi = math.Clamp( ((hit.SC_CoreEnt.sigrad/39.3700787)/72) ,0.2,1)
-				end
-
 
 				if hit:GetClass() == "shield" then
 					dmg = dmg * scale
@@ -196,8 +186,7 @@ function ENT:BeamTrace( tr )
 					scale = scale / 2
 				else
 					dmg = dmg*multi
-					--cbt_dealdevhit( hit, math.random( dmg / 2, dmg )*multi, 0, tr.HitPos, tr.StartPos, self.Owner )
-					SC_ApplyDamage(hit, {EM=dmg*0.6,EXP=0,KIN=0,THERM=dmg*0.4}, self.Owner, self, self:GetPos())
+					hit:TakeDamage(dmg / 2,self.Owner,self)
 				end
 			end
 

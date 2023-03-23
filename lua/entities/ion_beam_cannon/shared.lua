@@ -2,6 +2,7 @@ ENT.Type 			= "anim"
 ENT.Base 			= "base_anim"
 ENT.PrintName		= "Ion Beam Cannon"
 ENT.Author			= "Zup"
+ENT.Category		= "Ship Weapons"
 
 ENT.Spawnable = true
 ENT.AdminSpawnable = true

@@ -9,7 +9,6 @@
 ]]--
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
-include('entities/base_wire_entity/init.lua')
 include( 'shared.lua' )
 
 util.PrecacheSound( "sound/ship_weapons/wpn_plasma_blaster.wav" )
@@ -39,8 +38,8 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetUseType( SIMPLE_USE )
 
-	local inNames = {"Fire","X","Y","Z","Vector","Target","Color"}
-	local inTypes = {"NORMAL","NORMAL","NORMAL","NORMAL","VECTOR","ENTITY","VECTOR"}
+	local inNames = {"Fire","Vector","Target","Color"}
+	local inTypes = {"NORMAL","VECTOR","ENTITY","VECTOR"}
 	self.Inputs = WireLib.CreateSpecialInputs( self,inNames,inTypes)
 	self.Outputs = Wire_CreateOutputs( self, { "CanFire", "Firing" })
 
@@ -55,8 +54,6 @@ function ENT:Initialize()
 
 	self.NextFire = 0
 	self.SB_Ignore = true
-	self.SB_Ignore = true
-	self.SC_Immune = true
 	self.Firing = false
 	self.color = nil
 	self.beam = nil
@@ -96,9 +93,6 @@ function ENT:Use( ply )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"[Phaser Beam] Information:")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Beam Duration = "..BEAM.lifespan.." second(s)")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Maximum Range = "..BEAM.range)
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Damage per second vs Shields = "..tostring( BEAM.damage_per_second * BEAM.power / 2 ).."-"..tostring( BEAM.damage_per_second * BEAM.power ))
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Damage per second vs Ships = "..tostring( BEAM.damage_per_second / 2 ).."-"..tostring( BEAM.damage_per_second ))
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Damage Type = EM/Thermal")
 	ply:PrintMessage(HUD_PRINTTALK,"Detailed information about [Phaser] has been posted to your console.")
 	return false
 end
@@ -110,12 +104,6 @@ function ENT:TriggerInput(iname, value)
 		else
 			self.Firing = false
 		end
-	elseif (iname == "X") then
-		self.vector.x = value
-	elseif (iname == "Y") then
-		self.vector.y = value
-	elseif (iname == "Z") then
-		self.vector.z = value
 	elseif (iname == "Vector") then
 			self.vector = value
 	elseif (iname == "Target") then
@@ -127,9 +115,9 @@ function ENT:TriggerInput(iname, value)
 	elseif (iname == "Color") then
 		if value then
 			self.color = Vector( 50, 100, 300 )
-			self.color.x = math.Clamp( value.x, 100, 255 )
-			self.color.y = math.Clamp( value.y, 100, 255 )
-			self.color.z = math.Clamp( value.z, 100, 255 )
+			self.color.x = math.Clamp( value.x, 0, 255 )
+			self.color.y = math.Clamp( value.y, 0, 255 )
+			self.color.z = math.Clamp( value.z, 0, 255 )
 		else
 			self.color = nil
 		end

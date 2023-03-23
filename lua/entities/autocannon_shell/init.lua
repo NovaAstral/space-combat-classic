@@ -95,18 +95,12 @@ end
 function ENT:Explode( e )
 	--local pos, extra = self:GetPos(), math.random(15,75)*2 -- was 15,75
 	local pos, extra = self:GetPos(), math.random(0,20)*5
-	local damage = 50+extra
 
-	--cbt_hcgexplode( pos, 50, extra, 0, self.Owner )
-	local expdmg = damage
-	SC_Explode(pos, 72, {EM=0,EXP=expdmg*0.8,KIN=0,THERM=expdmg*0.2}, self.Owner, self )
+	util.BlastDamage(self,self.Owner,pos,72,math.random(25,50))
 
 	if e:GetClass() == "shield" then
 		--e:Hit( self, pos, 150+extra*2, -1*self:GetForward():Normalize() )
 		e:Hit( self, pos, damage*2, RealNormal(-1*self:GetForward()) )
-	else
-		--cbt_dealhcghit( e, extra, 5, e:GetPos(), pos, self.Owner )
-		SC_ApplyDamage(e, {EM=0,EXP=damage*0.2,KIN=damage*0.7,THERM=damage*0.1}, self.Owner, self, self:GetPos())
 	end
 
 	self:EmitSound( "ship_weapons/wpn_autocannon_hit.wav", math.random(20)+320, math.random(30)+60 )

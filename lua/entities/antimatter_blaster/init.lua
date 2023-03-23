@@ -8,7 +8,6 @@
 ]]--
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
-include('entities/base_wire_entity/init.lua')
 include( 'shared.lua' )
 
 util.PrecacheSound( "sound/ship_weapons/wpn_missile.wav" )
@@ -25,8 +24,8 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetUseType( SIMPLE_USE )
 
-	local inNames = {"Fire","X","Y","Z","Vector","Target"}
-	local inTypes = {"NORMAL","NORMAL","NORMAL","NORMAL","VECTOR","ENTITY"}
+	local inNames = {"Fire","Vector","Target"}
+	local inTypes = {"NORMAL","VECTOR","ENTITY"}
 	self.Inputs = WireLib.CreateSpecialInputs( self,inNames,inTypes)
 	self.Outputs = Wire_CreateOutputs( self, { "CanFire", "ShotsLeft" })
 
@@ -185,20 +184,6 @@ function ENT:Launch()
 
 	--aimdir = ( aimdir * 0.965 + VectorRand() * 0.035 ):Normalize()
 	aimdir = RealNormal( aimdir * 0.982 + VectorRand() * 0.036 )
-	if IsValid( self.SC_CoreEnt ) then
-		--check to see if the aimdir will hit something welded to the same ship, and if so, prevent it from firing!
-		local tr = {}
-		  tr.start = shootpos
-		  tr.endpos = shootpos + aimdir * 1000
-		  tr = util.TraceLine( tr )
-
-		if tr.HitNonWorld then
-			if IsValid( tr.HitEntity ) and IsValid( tr.HitEntity.SC_CoreEnt ) and self.SC_CoreEnt == tr.HitEntity.SC_CoreEnt then
-				self:Refund()
-				return
-			end
-		end
-	end
 
 	local bolt = ents.Create( "antimatter_bolt" )
 		bolt:SetPos( shootpos + (aimdir*120) )

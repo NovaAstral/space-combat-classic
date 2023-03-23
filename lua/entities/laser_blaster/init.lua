@@ -8,7 +8,6 @@
 ]]--
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
-include('entities/base_wire_entity/init.lua')
 include( 'shared.lua' )
 
 util.PrecacheSound( "sound/ship_weapons/wpn_laser_blaster.wav" )
@@ -23,8 +22,8 @@ function ENT:Initialize()
 	self.Entity:SetSolid( SOLID_VPHYSICS )
 	self.Entity:SetUseType( SIMPLE_USE )
 
-	local inNames = {"Fire","X","Y","Z","Vector","Target","Color"}
-	local inTypes = {"NORMAL","NORMAL","NORMAL","NORMAL","VECTOR","ENTITY","VECTOR"}
+	local inNames = {"Fire","Vector","Target","Color"}
+	local inTypes = {"NORMAL","VECTOR","ENTITY","VECTOR"}
 	self.Inputs = WireLib.CreateSpecialInputs( self.Entity,inNames,inTypes)
 	self.Outputs = Wire_CreateOutputs( self.Entity, { "CanFire" })
 
@@ -37,7 +36,6 @@ function ENT:Initialize()
 	end
 
 	self.SB_Ignore = true
-	self.SC_Immune = true
 	self.Magazine = 0
 	self.Firing = false
 
@@ -76,9 +74,6 @@ function ENT:Use( ply )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"[Laser Bolt] Information:")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Velocity = 4,000")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Range = 21,000~")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Shields = 160-600")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Ships = 120-240")  --was 120-300
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage Type = EM/Thermal")
 	ply:PrintMessage(HUD_PRINTTALK,"Detailed information about [Laser Blaster] has been posted to your console.")
 	return false
 end
@@ -90,12 +85,6 @@ function ENT:TriggerInput(iname, value)
 		else
 			self.Firing = false
 		end
-	elseif (iname == "X") then
-		self.vector.x = value
-	elseif (iname == "Y") then
-		self.vector.y = value
-	elseif (iname == "Z") then
-		self.vector.z = value
 	elseif (iname == "Vector") then
 		self.vector = value
 	elseif (iname == "Target") then
@@ -107,9 +96,9 @@ function ENT:TriggerInput(iname, value)
 	elseif (iname == "Color") then
 		if value then
 			self.color = Vector( 255, 80, 40 )
-			self.color.x = math.Clamp( value.x, 100, 255 )
-			self.color.y = math.Clamp( value.y, 100, 255 )
-			self.color.z = math.Clamp( value.z, 100, 255 )
+			self.color.x = math.Clamp( value.x, 0, 255 )
+			self.color.y = math.Clamp( value.y, 0, 255 )
+			self.color.z = math.Clamp( value.z, 0, 255 )
 		else
 			self.color = nil --Vector( 255, 80, 40 )
 		end
@@ -186,21 +175,6 @@ function ENT:Launch()
 
 	--aimdir = ( aimdir * 0.987 + VectorRand() * 0.013 ):Normalize()
 	aimdir = RealNormal( aimdir * 0.993 + VectorRand() * 0.014 )
-
-	if IsValid( self.SC_CoreEnt ) then
-		--check to see if the aimdir will hit something welded to the same ship, and if so, prevent it from firing!
-		local tr = {}
-		  tr.start = shootpos
-		  tr.endpos = shootpos + aimdir * 1000
-		  tr = util.TraceLine( tr )
-
-		if tr.HitNonWorld then
-			if IsValid( tr.HitEntity ) and IsValid( tr.HitEntity.SC_CoreEnt ) and self.SC_CoreEnt == tr.HitEntity.SC_CoreEnt then
-				self:Refund()
-				return
-			end
-		end
-	end
 
 	local bolt = ents.Create( "laser_blaster_bolt" )
 		bolt:SetPos( shootpos + (aimdir*120) )

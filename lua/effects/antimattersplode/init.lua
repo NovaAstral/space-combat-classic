@@ -42,7 +42,7 @@ end
  ---------------------------------------------------------*/ 
 function EFFECT:Think( ) 
 
- 	self.Entity:SetColor(100,100,200,100)
+ 	--self.Entity:SetColor(100,100,200,100) --This errors and i dont know why
 	self.CScale = self.CScale + 0.1
 
  	self.Refract = self.Refract + 2.0 * FrameTime() 

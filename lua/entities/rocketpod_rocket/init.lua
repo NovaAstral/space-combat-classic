@@ -86,7 +86,6 @@ function ENT:Think()
 			self.speed = 2000
 			self:Fire( "kill", "", 8 )
 		end
-		--SC_Rockets[ self:EntIndex() ] = self.Entity --this just makes sure I always get included in the rockets table for devices that track/shootdown rockets!
 	else
 		local vec, dir = self:GetTargetData( clk )
 		if ct < self.prehoming then
@@ -185,14 +184,6 @@ function ENT:Think()
 end
 
 function ENT:PassesTriggerFilters( ent )
-	if IsValid( self.launcher ) then
-		local core = self.launcher.SC_CoreEnt
-		if IsValid( core ) then
-			if core == ent.SC_CoreEnt then
-				return false
-			end
-		end
-	end
 	return true
 end
 
@@ -226,35 +217,16 @@ function ENT:EndTouch()
 end
 
 function ENT:OnRemove()
-	--SC_Rockets[ self:EntIndex() ] = nil
 end
 
 function ENT:Explode(e)
 	--local pos, extra = self:GetPos(), math.random(1,21) * 25
 	local pos, extra = self:GetPos(), math.random(0,5)*100
-	
-	
-	local multi = 1
-	if e.SC_CoreEnt and e.SC_CoreEnt.sigrad then
-		multi = math.Clamp( ((e.SC_CoreEnt.sigrad/39.3700787)/50)^2,0.1,1)
-	end
-	local dmg = (1000+extra) * multi
-	local expdmg = 250
-	--cbt_hcgexplode( pos, 100, 200, 25, self.Owner )
-	SC_Explode(pos, 100, {EM=0,EXP=expdmg*0.8,KIN=expdmg*0.1,THERM=expdmg*0.1}, self.Owner, self )
-	
+
+	util.BlastDamage(self,self.Owner,pos,100,250)
 	if e:GetClass() == "shield" then
 		--e:Hit( self, pos, (975+extra)*4, -1 * self:GetForward():Normalize() ) //5250 was 750
-		e:Hit( self, pos, (500+extra)*2, -1 * self:GetForward():Normalize() ) //5250 was 750
-	else
-		/*
-		if e:IsPlayer() or e:IsNPC() then
-			cbt_dealhcghit( e, 1500, 0, e:GetPos(), pos, self.Owner ) //1500 was 150
-		else
-			cbt_dealhcghit( e, (975+extra)*multi, 0, e:GetPos(), pos, self.Owner ) //1750 was 250
-		end
-		*/
-		SC_ApplyDamage(e, {EM=0,EXP=dmg*0.6,KIN=dmg*0.3,THERM=dmg*0.1}, self.Owner, self, self:GetPos())
+		e:Hit( self, pos, (500+extra)*2, -1 * self:GetForward():Normalize() ) --5250 was 750
 	end
 
 	self:EmitSound("explode_9",300,100)

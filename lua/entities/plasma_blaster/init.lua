@@ -8,7 +8,6 @@
 ]]--
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
-include('entities/base_wire_entity/init.lua')
 include( 'shared.lua' )
 
 util.PrecacheSound( "sound/ship_weapons/wpn_plasma_blaster.wav" )
@@ -23,8 +22,8 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetUseType( SIMPLE_USE )
 
-	local inNames = {"Fire","X","Y","Z","Vector","Target","Color"}
-	local inTypes = {"NORMAL","NORMAL","NORMAL","NORMAL","VECTOR","ENTITY","VECTOR"}
+	local inNames = {"Fire","Vector","Target","Color"}
+	local inTypes = {"NORMAL","VECTOR","ENTITY","VECTOR"}
 	self.Inputs = WireLib.CreateSpecialInputs( self,inNames,inTypes)
 	self.Outputs = Wire_CreateOutputs( self, { "CanFire" })
 
@@ -37,7 +36,6 @@ function ENT:Initialize()
 	end
 
 	self.SB_Ignore = true
-	self.SC_Immune = true
 	self.Magazine = 0
 	self.Firing = false
 
@@ -76,11 +74,7 @@ function ENT:Use( ply )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"[Plasma Bolt] Information:")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Velocity = 4,000~")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Range = 13,000~")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Shields = 1200-2400") --was 1500-2400
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Ships = 300-600") --+25 Piercing Damage --was 550-600
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage Type = Thermal/Kinetic")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Explosion Radius = 50-90")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Explosion Damage Type = Thermal/Explosive")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Explosion Damage at Epicenter = 200-300") --was 250-400
 	ply:PrintMessage(HUD_PRINTTALK,"Detailed information about [Plasma Blaster] has been posted to your console.")
 	return false
@@ -93,12 +87,6 @@ function ENT:TriggerInput(iname, value)
 		else
 			self.Firing = false
 		end
-	elseif (iname == "X") then
-		self.vector.x = value
-	elseif (iname == "Y") then
-		self.vector.y = value
-	elseif (iname == "Z") then
-		self.vector.z = value
 	elseif (iname == "Vector") then
 		self.vector = value
 	elseif (iname == "Target") then
@@ -110,9 +98,9 @@ function ENT:TriggerInput(iname, value)
 	elseif (iname == "Color") then
 		if value then
 			self.color = Vector( 40, 255, 80 )
-			self.color.x = math.Clamp( value.x, 100, 255 )
-			self.color.y = math.Clamp( value.y, 100, 255 )
-			self.color.z = math.Clamp( value.z, 100, 255 )
+			self.color.x = math.Clamp( value.x, 0, 255 )
+			self.color.y = math.Clamp( value.y, 0, 255 )
+			self.color.z = math.Clamp( value.z, 0, 255 )
 		else
 			self.color = nil --Vector( 40, 255, 80 )
 		end
@@ -189,21 +177,6 @@ function ENT:Launch()
 
 	--aimdir = ( aimdir * 0.982 + VectorRand() * 0.018 ):Normalize()
 	aimdir = RealNormal( aimdir * 0.990 + VectorRand() * 0.020 )
-
-	if IsValid( self.SC_CoreEnt ) then
-		--check to see if the aimdir will hit something welded to the same ship, and if so, prevent it from firing!
-		local tr = {}
-		  tr.start = shootpos
-		  tr.endpos = shootpos + aimdir * 1000
-		  tr = util.TraceLine( tr )
-
-		if tr.HitNonWorld then
-			if IsValid( tr.HitEntity ) and IsValid( tr.HitEntity.SC_CoreEnt ) and self.SC_CoreEnt == tr.HitEntity.SC_CoreEnt then
-				self:Refund()
-				return
-			end
-		end
-	end
 
 	local bolt = ents.Create( "plasma_blaster_bolt" )
 		bolt:SetPos( shootpos + (aimdir * 120) )

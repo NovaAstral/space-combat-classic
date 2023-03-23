@@ -8,7 +8,6 @@
 ]]--
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
-include('entities/base_wire_entity/init.lua');
 include('shared.lua')
 
 util.PrecacheSound( "sound/ship_weapons/wpn_autocannon.wav" )
@@ -37,8 +36,6 @@ function ENT:Initialize()
 		phys:EnableCollisions(true)
 	end
 
-	--self.SB_Ignore = true
-	self.SC_Immune = true
 	self.Magazine = 0
 	self.Firing = false
 	self.NextFire = CurTime()
@@ -79,10 +76,6 @@ function ENT:Use( ply )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"[50mm Autocannon Shell] Information:" )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Velocity = 4,000" )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Range = 14,000~")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Shields = 100-300" )
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Ships = 50-150 per, 300-1000 dps" )
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage Type = Kinetic/Explosive/Thermal" )
-	--ply:PrintMessage(HUD_PRINTCONSOLE,"* +5 Piercing Damage" )
 	ply:PrintMessage(HUD_PRINTTALK,"Detailed information about [Autocannon] has been posted to your console. Press [`] to open your console." )
 	return false
 end
@@ -163,21 +156,6 @@ function ENT:Launch()
 
 	--aimdir = ( aimdir * 0.995 + VectorRand() * 0.005 ):Normalize()
 	aimdir = RealNormal(( aimdir * 0.995 + VectorRand() * 0.01 ))
-
-	if IsValid( self.SC_CoreEnt ) then
-		--check to see if the aimdir will hit something welded to the same ship, and if so, prevent it from firing!
-		local tr = {}
-		  tr.start = shootpos
-		  tr.endpos = shootpos + aimdir * 1000
-		  tr = util.TraceLine( tr )
-
-		if tr.HitNonWorld then
-			if IsValid( tr.HitEntity ) and IsValid( tr.HitEntity.SC_CoreEnt ) and self.SC_CoreEnt == tr.HitEntity.SC_CoreEnt then
-				self:Refund()
-				return
-			end
-		end
-	end
 
 	local bullet = ents.Create( "autocannon_shell" )
 		bullet:SetPos( shootpos )

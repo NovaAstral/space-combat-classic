@@ -25,7 +25,6 @@ function ENT:Initialize()
 	--self.Entity:SetCollisionGroup(COLLISION_GROUP_PROJECTILE)
 	--self.Entity:SetMoveType(MOVETYPE_FLY)
 
-	self.SC_Immune = true --make weapons ignore me
 	self.SB_Ignore = true --make spacebuild ignore me
 	self.warhead = true
 	self.Untouchable = true
@@ -63,14 +62,6 @@ function ENT:Think()
 end
 
 function ENT:PassesTriggerFilters( ent )
-	if IsValid( self.launcher ) then
-		local core = self.launcher.SC_CoreEnt
-		if IsValid( core ) then
-			if core == ent.SC_CoreEnt then
-				return false
-			end
-		end
-	end
 	return true
 end
 
@@ -80,13 +71,13 @@ function ENT:StartTouch( ent )
 		return
 	else
 
-		if IsValid( ent ) and ((ent.SC_CoreEnt != self.launcher.SC_CoreEnt) or (self.launcher.SC_CoreEnt == nil)) then
+		if(IsValid(ent)) then
 			if ent:IsWorld() then
 				self:Explode( self )
 			else
 				self:Explode( ent )
 			end
-		elseif (ent.SC_CoreEnt != self.launcher.SC_CoreEnt) or (self.launcher.SC_CoreEnt == nil) then
+		else
 			self:Explode( self )
 		end
 
@@ -111,11 +102,7 @@ function ENT:Explode( e )
 		--e:Hit( self, pos, (extra*4)*2, -1*self:GetForward():Normalize() )
 		e:Hit( self, pos, 120+(extra*4), -1*RealNormal(self:GetForward()))  -- 160-600
 	else
-		/*
-		cbt_dealhcghit( e, 50+extra, 0, e:GetPos(), pos, self.Owner )
-		cbt_dealnrghit( e, 50+extra, 0, e:GetPos(), pos, self.Owner )
-		*/
-		SC_ApplyDamage(e, {EM=damage*0.5,EXP=0,KIN=0,THERM=damage*0.5}, self.Owner, self, self:GetPos())
+		e:TakeDamage(math.random(120,240),self.Owner,self)
 	end
 
 	self:EmitSound( "ship_weapons/wpn_laser_blaster_hit.wav", math.random(20)+340, math.random(30)+60 )

@@ -1,7 +1,6 @@
 
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
-include('entities/base_wire_entity/init.lua')
 include( 'shared.lua' )
 
 local ENERGY = 1000 //energy used to create rocket during reload phase
@@ -17,8 +16,8 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetUseType( SIMPLE_USE )
 
-	local inNames = {"Fire","X","Y","Z","Vector","Target"}
-	local inTypes = {"NORMAL","NORMAL","NORMAL","NORMAL","VECTOR","ENTITY"}
+	local inNames = {"Fire","Vector","Target"}
+	local inTypes = {"NORMAL","VECTOR","ENTITY"}
 	self.Inputs = WireLib.CreateSpecialInputs( self,inNames,inTypes)
 	self.Outputs = Wire_CreateOutputs( self, { "ShotsLeft", "CanFire" })
 	
@@ -30,7 +29,6 @@ function ENT:Initialize()
 		self.PhysObj:EnableCollisions(true)
 	end
 
-	self.SC_Immune = true
 	self.Magazine = 0
 	self.Firing = false
 	self.ArmDelay = CurTime()	
@@ -72,13 +70,8 @@ function ENT:Use( ply )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Velocity = 1,000-5,000" )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Acceleration = 1,500/sec" )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Projectile Lifetime = "..ROCKET_LIFE.." seconds")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Shields = 2,000-4,000" ) //775-1,000" ) --5,275-5,500"
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage vs Ships = 1,000-1,500" ) //275-500" ) --1,775-2,000"
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Impact Damage Type = Explisive/Kinetic/Thermal" )
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Explosion Radius = 100")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Explosion Damage Type = Explosive")
 	ply:PrintMessage(HUD_PRINTCONSOLE,"Explosion Damage at Epicenter = 250")
-	ply:PrintMessage(HUD_PRINTCONSOLE,"Explosion Shrapnel Damage = 25")
 	ply:PrintMessage(HUD_PRINTTALK,"Detailed information about [Rocket Pod] has been posted to your console. Press [`] to open your console." )
 	return false
 end
@@ -90,12 +83,6 @@ function ENT:TriggerInput(iname, value)
 		else
 			self.Firing = false
 		end
-	elseif (iname == "X") then
-		self.vec.x = value
-	elseif (iname == "Y") then
-		self.vec.y = value
-	elseif (iname == "Z") then
-		self.vec.z = value
 	elseif (iname == "Vector") then
 		self.vec = value
 	elseif (iname == "Target") then
