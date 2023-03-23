@@ -1,0 +1,8 @@
+
+"UnlitGeneric" 
+{ 
+	"$basetexture" "VGUI/entities/antimatter_blaster"
+	"$vertexcolor" 	1 
+	"$vertexalpha" 	1 
+	"$nolod" 	1 
+} 
