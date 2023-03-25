@@ -30,10 +30,9 @@ function ENT:Initialize()
 		self.PhysObj:EnableCollisions(true)
 	end
 
-	self.SC_Immune = true
 	self.Magazine = 0
 	self.Firing = false
-	self.ArmDelay = CurTime()	
+	self.ArmDelay = CurTime()
 	self.vec = Vector(0,0,0)
 
 	RD_AddResource(self, "energy", 0)
