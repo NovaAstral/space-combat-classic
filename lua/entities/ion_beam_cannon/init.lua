@@ -31,7 +31,7 @@ function ENT:Initialize()
 	Wire_TriggerOutput(self.Entity,"Multiplier",self.multiplier) 	
 	
 	self.playedcharge 	= false
-	self.playedfire 	= false	
+	self.playedfire 	= false
 	self.playedfiring 	= false
 	
 	self.Sound = CreateSound( self.Entity, Sound("ambient/atmosphere/noise2.wav") )
@@ -245,21 +245,22 @@ function ENT:WeaponFiring()
 		else
 			i = tr.Entity
 		end
+
 	    if tr.Entity:GetClass() == "shield" then
-	        i.Parent.Strength = math.Clamp(i.Parent.Strength-((((10 * self.multiplier)/2000)*100)/(i.Parent.StrengthMultiplier[1]*i.Parent.StrengthConfigMultiplier)),0,100)
-			i:Hit(self.Entity,tr.HitPos,1.0) --So it still plays the shields hit effect
+			i:Hit(self.Entity,tr.HitPos,self.damagebase * self.multiplier * 10) --So it still plays the shields hit effect
+			print(self.damagebase * self.multiplier * 10)
 		end
-		i:TakeDamage(self.damagebase * self.multiplier, self:GetOwner(), self.Entity)
+
+		i:TakeDamage(self.damagebase * self.multiplier * 10, self:GetOwner(), self.Entity)
 	end
-	    
 		
 	self:SetNWBool( "drawbeam", true )
 	self:SetNWBool( "charging", false )
 	
 	if tr2 and tr2.Entity:IsValid() then
-		tr2.Entity:TakeDamage(self.damagebase  * self.multiplier, self.Owner, self.Entity)
+		tr2.Entity:TakeDamage(self.damagebase * self.multiplier * 10, self.Owner, self.Entity)
 	else
-		tr.Entity:TakeDamage(self.damagebase * self.multiplier, self.Owner, self.Entity)
+		tr.Entity:TakeDamage(self.damagebase * self.multiplier * 10, self.Owner, self.Entity)
 	end
 end  
 
