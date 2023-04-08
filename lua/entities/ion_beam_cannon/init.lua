@@ -247,11 +247,12 @@ function ENT:WeaponFiring()
 		end
 
 	    if tr.Entity:GetClass() == "shield" then
-			i:Hit(self.Entity,tr.HitPos,self.damagebase * self.multiplier * 10) --So it still plays the shields hit effect
-			print(self.damagebase * self.multiplier * 10)
+			i:Hit(self.Entity,tr.HitPos,self.damagebase * self.multiplier) --So it still plays the shields hit effect
+			print(self.damagebase * self.multiplier)
 		end
 
-		i:TakeDamage(self.damagebase * self.multiplier * 10, self:GetOwner(), self.Entity)
+		i:TakeDamage(self.damagebase * self.multiplier, self:GetOwner(), self.Entity)
+		print(self.damagebase * self.multiplier)
 	end
 		
 	self:SetNWBool( "drawbeam", true )
